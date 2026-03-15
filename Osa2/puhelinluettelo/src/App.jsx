@@ -1,28 +1,76 @@
 import { useState } from 'react'
 
-const ShowList = ({ allPersons }) => {
+const Filter = ({ valueToFind, onChange}) => {
   return (
-    <div>
-      {allPersons.map(person => {
-        return ( 
-          <p key={person.name}> 
-            {person.name} {person.number}
-          </p>
-        )
-      })}
-    </div>
+    <form>
+      <div>
+        filter shown with
+        <input value={valueToFind} onChange={onChange}/>
+      </div>
+    </form>
+  )
+}
+
+const Persons = ({ allPersons, filteredByName }) => {
+  if(filteredByName.length === 0) {
+    return (
+      <div>
+        {allPersons.map(person => {
+          return ( 
+            <p key={person.name}> 
+              {person.name} {person.number}
+            </p>
+          )
+        })}
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        {allPersons.map(person => {
+          if (person.name.toLowerCase().indexOf(filteredByName.toLowerCase()) != -1) {
+              return (
+                <p key={person.name}>
+                  {person.name} {person.number}
+                </p>
+              )
+          }
+        })}
+      </div>
+    )
+  }
+}
+
+const PersonForm = ({ addNote, newName, newPhoneNumber, handleNameChange, handlePhoneChange }) => {
+  return (
+    <form onSubmit={addNote}>
+      <div> 
+        name: 
+        <input value={newName} onChange={handleNameChange}/>   
+      </div>
+
+      <div>
+        number: 
+        <input value={newPhoneNumber} onChange={handlePhoneChange}/>
+      </div>
+
+      <div> 
+        <button type="submit"> add </button>
+      </div>
+    </form>
   )
 }
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { 
-      name: 'Arto Hellas',
-      number: '040-1231244'
-    }
+    { name: 'Arto Hellas', number: '040-123456' },
+    { name: 'Ada Lovelace', number: '39-44-5323523' },
+    { name: 'Dan Abramov', number: '12-43-234345' },
+    { name: 'Mary Poppendieck', number: '39-23-6423122' }
   ])
   const [newName, setNewName] = useState('')
-  const [newPhoneNumber, setnewPhoneNumber] = useState('')
+  const [newPhoneNumber, setNewPhoneNumber] = useState('')
+  const [findByName, setFindByName] = useState('')
 
   const addNote = (event) => {
     event.preventDefault()
@@ -38,39 +86,32 @@ const App = () => {
     }
 
     setNewName('')
-    setnewPhoneNumber('')
+    setNewPhoneNumber('')
   }
 
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
   const handlePhoneChange = (event) => {
-    setnewPhoneNumber(event.target.value)
+    setNewPhoneNumber(event.target.value)
+  }
+  const handleFindByNameChange = (event) => {
+    setFindByName(event.target.value)
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addNote}>
-        
-        <div> 
-          name: 
-          <input value={newName} onChange={handleNameChange}/>   
-        </div>
 
-        <div>
-          number: 
-          <input value={newPhoneNumber} onChange={handlePhoneChange}/>
-        </div>
+      <Filter valueToFind={findByName} onChange={handleFindByNameChange}/>
 
-        <div> 
-          <button type="submit"> add </button>
-        </div>
+      <h2>add a new</h2>
 
-      </form>
+      <PersonForm addNote={addNote} newName={newName} newPhoneNumber={newPhoneNumber} handleNameChange={handleNameChange} handlePhoneChange={handlePhoneChange}/>
+
       <h2>Numbers</h2>
       
-      <ShowList allPersons={persons}/>
+      <Persons allPersons={persons} filteredByName={findByName}/>
 
     </div>
   )
