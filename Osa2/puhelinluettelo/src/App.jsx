@@ -30,11 +30,11 @@ const Persons = ({ allPersons, filteredByName }) => {
       <div>
         {allPersons.map(person => {
           if (person.name.toLowerCase().indexOf(filteredByName.toLowerCase()) != -1) {
-              return (
-                <p key={person.name}>
-                  {person.name} {person.number}
-                </p>
-              )
+            return (
+              <p key={person.name}>
+                {person.name} {person.number}
+              </p>
+            )
           }
         })}
       </div>
