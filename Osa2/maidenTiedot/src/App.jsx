@@ -17,7 +17,7 @@ const RenderCountries = ({ countriesList, oneCountry, buttonOnChange, weather })
       <div> Too many mathces, specify another filter </div>
     )
   } 
-  if (oneCountry !== null) {
+  if (oneCountry !== null && weather !== null) {
     return (
       <div>
         <h1> {oneCountry.name.common} </h1>
@@ -32,9 +32,9 @@ const RenderCountries = ({ countriesList, oneCountry, buttonOnChange, weather })
         <img src={oneCountry.flags.png} alt="flag" />
 
         <h1>Weather in {oneCountry.capital} </h1>
-        <p>Temperature {weather.current.temp} Celsius</p>
+        <p>Temperature {weather.main.temp} Celsius</p>
         <img />
-        <p>Wind {weather.current.wind_speed} m/s </p>
+        <p>Wind {weather.wind.speed} m/s </p>
       </div>
     )    
   }
@@ -94,8 +94,8 @@ const App = () => {
   }, [countryForUseEffect])
 
   useEffect(() => {
-    if (api_key && filteredList.length === 1) {
-      axios.get(`https://api.openweathermap.org/data/3.0/onecall?lat=${filteredList[0].latlng[0]}&lon=${filteredList[0].latlng[1]}&units=metric&appid=${api_key}`)
+    if (api_key && filteredList.length === 1) {5
+      axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${filteredList[0].latlng[0]}&lon=${filteredList[0].latlng[1]}&units=metric&appid=${api_key}`)
       .then(response => {
         setWeather(response.data)
       }).catch(() => console.log("unable to get weather data"))
