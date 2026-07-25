@@ -59,24 +59,51 @@ describe('Blog app', () => {
           await page.getByRole('button', { name: 'view'}).click()
 
           page.on('dialog', async dialog => {
-            expect(dialog.type()).toBe('confirm');
-            expect(dialog.message()).toContain(`Remove blog testTitle by testAuthor`);            
-            await dialog.accept();
+            expect(dialog.type()).toBe('confirm')
+            expect(dialog.message()).toContain(`Remove blog testTitle by testAuthor`)       
+            await dialog.accept()
           })
 
           await page.getByRole('button', { name: 'remove'}).click()
 
-          await expect(page.getByText('testTitle testAuthor')).not.toBeVisible();
+          await expect(page.getByText('testTitle testAuthor')).not.toBeVisible()
         })
 
-        test.only('user can see the remove button', async ( {page} ) => {
+        test('user can see the remove button', async ( {page} ) => {
           await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
           
           await page.getByRole('button', { name: 'view'}).click()
-          await expect(page.getByRole('button', { name: 'remove'})).toBeVisible();
+          await expect(page.getByRole('button', { name: 'remove'})).toBeVisible()
         })
 
-        
+        test.only('likes are in correct order', async ( {page} ) => {
+          await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
+          await createBlog(page, 'testTitle1', 'testAuthor1', 'testUrl1')
+
+          const blog1 = page.locator('.blog').filter({ hasText: /^testTitle / })
+          const blog2 = page.locator('.blog').filter({ hasText: /^testTitle1 / })
+
+          await blog1.getByRole('button', { name: 'view' }).click()
+          await blog2.getByRole('button', { name: 'view' }).click()
+          
+          const likeButton1 = blog1.getByRole('button', { name: 'like' })
+          const likeButton2 = blog2.getByRole('button', { name: 'like' })
+
+          await likeButton1.click()
+          await expect(blog1.getByText('likes 1')).toBeVisible()
+          await likeButton1.click()
+          await expect(blog1.getByText('likes 2')).toBeVisible()
+
+          await likeButton2.click()
+          await expect(blog2.getByText('likes 1')).toBeVisible()
+
+          await expect(blog1.getByText('likes 2')).toBeVisible()
+          await expect(blog2.getByText('likes 1')).toBeVisible()
+
+          const blogs = page.locator('.blog')
+          await expect(blogs.first()).toContainText('testTitle')            
+          await expect(blogs.last()).toContainText('testTitle1')
+        })
       })
   })
 })
