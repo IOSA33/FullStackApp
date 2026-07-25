@@ -76,7 +76,7 @@ describe('Blog app', () => {
           await expect(page.getByRole('button', { name: 'remove'})).toBeVisible()
         })
 
-        test.only('likes are in correct order', async ( {page} ) => {
+        test('likes are in correct order', async ( {page} ) => {
           await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
           await createBlog(page, 'testTitle1', 'testAuthor1', 'testUrl1')
 
