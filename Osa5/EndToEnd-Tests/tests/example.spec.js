@@ -1,19 +1,21 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+const { test, expect, beforeEach, describe } = require('@playwright/test')
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+describe('Blog app', () => {
+  beforeEach(async ({ page, request }) => {
+    await request.post('http://localhost:3003/api/testing/reset')
+    await request.post('http://localhost:3003/api/users', {
+      data: {
+        name: 'Matti Luukkainen',
+        username: 'mluukkai',
+        password: 'salainen'
+      }
+    })
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+    await page.goto('http://localhost:5173')
+  })
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-});
+  test('Login form is shown', async ({ page }) => {
+    await expect(page.getByLabel('username')).toBeVisible()
+    await expect(page.getByLabel('password')).toBeVisible()
+  })
+})
