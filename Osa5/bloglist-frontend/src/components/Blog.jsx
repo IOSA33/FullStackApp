@@ -1,28 +1,12 @@
+import { useParams, useNavigate } from 'react-router-dom'
 import Togglable from './Togglable'
-import { useState } from 'react'
 
-const Blog = ({ blog, updateLikes, deleteBlog }) => {
-  const [showInfo, setShowInfo] = useState(false)
-  const changeShowInfo = () => {
-    setShowInfo(!showInfo)
-  }
+const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
+  const id = useParams().id
+  const navigate = useNavigate()
 
-  const visibilityFunc = () => {
-    if (showInfo) {
-      return 'hide'
-    } else {
-      return 'view'
-    }
-  }
-
-  const visibilityStyle = { display : showInfo ? '' : 'none' }
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
+  if(!blog) {
+    return null
   }
 
   const handleUpdatedLikes = () => {
@@ -34,24 +18,26 @@ const Blog = ({ blog, updateLikes, deleteBlog }) => {
       return
     }
     deleteBlog(blog.id)
+    navigate('/')
+  }
+
+  const remove_style = {
+    display: user ? '': 'none'
   }
 
   return (
-    <div style={blogStyle} className='blog'>
-      {blog.title} {blog.author}
+    <div className='blog'>
+      
+      <h1>{blog.title} by {blog.author}</h1>
 
-        <button onClick={() => changeShowInfo()}>
-          {visibilityFunc()}
-        </button>
-
-      <div style={visibilityStyle}>
+      <div>
         {blog.url}
         <br></br>
         likes {blog.likes} <button onClick={() => handleUpdatedLikes()}>like</button>
         <br></br>
         {blog.user?.name}
         <br></br>
-        <button onClick={() => handleDeleteBlog()}>remove</button>
+        <button style={remove_style} onClick={() => handleDeleteBlog()}>remove</button>
       </div>
 
     </div>

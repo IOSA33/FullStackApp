@@ -1,37 +1,13 @@
 import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 import Togglable from "./Togglable"
 import CreateForm from "./CreateForm"
-import Blog from "./Blog"
 import blogService from '../services/blogs'
 
 const Blogs = ({errorMessage, showErrorMessage, user, blogs, setErrorMessage, setBlogs}) => {
 
     const blogFormRef = useRef()
-
-    const handleUpdateBlog = async (id, updatedBlogObject) => {
-        try {
-            const response = await blogService.update(id, updatedBlogObject)
-            setBlogs(blogs.map(b => b.id === id ? response : b))
-        } catch {
-            setErrorMessage('Missed some inputs')
-            setTimeout(() => {
-            setErrorMessage(null)
-            }, 5000)
-        }
-    }
-
-    const handleDeleteBlog = async (id) => {
-        try {
-            await blogService.deleteBlog(id)
-            setBlogs(blogs.filter(b => b.id !== id))
-        } catch {
-            setErrorMessage('Missed some inputs')
-            setTimeout(() => {
-            setErrorMessage(null)
-            }, 5000)
-        }
-    }
 
     const handleSubmitBlog = async (blogObject) => {
         try {
@@ -67,11 +43,15 @@ const Blogs = ({errorMessage, showErrorMessage, user, blogs, setErrorMessage, se
                 </div>
             )}
 
-            {
-                [...blogs].sort((a,b) => b.likes - a.likes).map(blog =>
-                <Blog key={blog.id} blog={blog} updateLikes={handleUpdateBlog} deleteBlog={handleDeleteBlog}/>
-                )
+            <ul>
+            { [...blogs].sort((a,b) => b.likes - a.likes).map(blog => (
+                <li key={blog.id}>
+                    <Link to={`/blogs/${blog.id}`}>{blog.title} by {blog.author}</Link>
+                </li>
+                ))
             }
+            </ul>
+            
         </div>
     )
 }
