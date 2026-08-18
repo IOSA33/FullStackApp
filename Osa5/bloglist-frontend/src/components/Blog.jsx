@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import Togglable from './Togglable'
+import { jwtDecode } from 'jwt-decode'
 
 const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
   const id = useParams().id
@@ -25,6 +26,18 @@ const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
     display: user ? '': 'none'
   }
 
+  const remove_button = () => {
+    if (user) {
+      const decodedToken = jwtDecode(user?.token)
+      if(blog.user?.id === decodedToken.id) {
+        return {display: ''}
+      } else {
+        return {display: 'none'}
+      }
+    }
+    return {display: 'none'}
+  }
+
   return (
     <div className='blog'>
       
@@ -33,11 +46,11 @@ const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
       <div>
         {blog.url}
         <br></br>
-        likes {blog.likes} <button onClick={() => handleUpdatedLikes()}>like</button>
+        likes {blog.likes} <button style={remove_style} onClick={() => handleUpdatedLikes()}>like</button>
         <br></br>
         {blog.user?.name}
         <br></br>
-        <button style={remove_style} onClick={() => handleDeleteBlog()}>remove</button>
+        <button style={remove_button()} onClick={() => handleDeleteBlog()}>remove</button>
       </div>
 
     </div>

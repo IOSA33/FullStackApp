@@ -2,8 +2,103 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 import CreateForm from './CreateForm'
+import { MemoryRouter } from 'react-router-dom'
 
-test('renders content', () => {
+const createFakeJwt = (payload) => {
+  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const body = btoa(JSON.stringify(payload))
+  const signature = 'fake_jwt_signature'
+  return `${header}.${body}.${signature}`
+}
+
+test.only('renders content for logged-in user when blog belongs to another user', () => {
+    const blog = {
+        title: "component test",
+        author: "testing author",
+        url: "testing url",
+        likes: 123,
+        user: {
+            id: "03w9fj09w3jf039fj039wjf99"
+        }
+    }
+
+    const payload = {
+        username: "testing author", 
+        id: "03w9fj09w3jf039fj039wjf990",
+    }
+
+    const user = {
+        token: createFakeJwt(payload),
+        username: "testing author",
+        name: "Test"
+    }
+
+    render(
+        <MemoryRouter>
+            <Blog blog={blog} user={user}/>
+        </MemoryRouter>
+    )
+
+    screen.debug()
+
+    let element = screen.getByText("component test by testing author")
+    expect(element).toBeDefined()
+
+    element = screen.getByText(/likes/)
+    expect(element).toBeDefined()
+
+    const elementNotVisible = screen.getByText("remove")
+    expect(elementNotVisible).not.toBeVisible()
+
+    const elementVisible = screen.getByText("like")
+    expect(elementVisible).toBeVisible()
+})
+
+
+test.only('renders content for logged-in user when blog belongs to the user', () => {
+    const blog = {
+        title: "component test",
+        author: "testing author",
+        url: "testing url",
+        likes: 123,
+        user: {
+            id: "03w9fj09w3jf039fj039wjf99"
+        }
+    }
+
+    const payload = {
+        username: "testing author", 
+        id: "03w9fj09w3jf039fj039wjf99",
+    }
+
+    const user = {
+        token: createFakeJwt(payload),
+        username: "testing author",
+        name: "Test"
+    }
+
+    render(
+        <MemoryRouter>
+            <Blog blog={blog} user={user}/>
+        </MemoryRouter>
+    )
+
+    screen.debug()
+
+    let element = screen.getByText("component test by testing author")
+    expect(element).toBeDefined()
+
+    element = screen.getByText(/likes/)
+    expect(element).toBeDefined()
+
+    const elementNotVisible = screen.getByText("remove")
+    expect(elementNotVisible).toBeVisible()
+
+    const elementVisible = screen.getByText("like")
+    expect(elementVisible).toBeVisible()
+})
+
+test.only('renders content for logged-out user', () => {
     const blog = {
         title: "component test",
         author: "testing author",
@@ -12,16 +107,25 @@ test('renders content', () => {
         user: "03w9fj09w3jf039fj039wjf99"
     }
 
-    render(<Blog blog={blog}/>)
+    render(
+        <MemoryRouter>
+            <Blog blog={blog}/>
+        </MemoryRouter>
+    )
 
     screen.debug()
 
-    const element = screen.getByText("component test testing author")
+    let element = screen.getByText("component test by testing author")
     expect(element).toBeDefined()
 
-    const elementNotVisible = screen.getByText(/testing url/)
+    element = screen.getByText(/likes/)
+    expect(element).toBeDefined()
+
+    let elementNotVisible = screen.getByText("like")
     expect(elementNotVisible).not.toBeVisible()
 
+    elementNotVisible = screen.getByText("remove")
+    expect(elementNotVisible).not.toBeVisible()
 })
 
 test('render url and likes when clicked view', async () => {
@@ -33,8 +137,11 @@ test('render url and likes when clicked view', async () => {
         user: "03w9fj09w3jf039fj039wjf99"
     }
 
-    render(<Blog blog={blog}/>)
-
+    render(
+        <MemoryRouter>
+            <Blog blog={blog}/>
+        </MemoryRouter>
+    )
     const user = userEvent.setup()
     const button = screen.getByText("view")
     await user.click(button)
@@ -57,7 +164,11 @@ test('like button clicked twise', async () => {
 
     const mockHandler = vi.fn()
 
-    render(<Blog blog={blog} updateLikes={mockHandler} />)
+    render(
+        <MemoryRouter>
+            <Blog blog={blog} updateLikes={mockHandler} />
+        </MemoryRouter> 
+    )
 
     const user = userEvent.setup()
     const button = screen.getByText("view")
