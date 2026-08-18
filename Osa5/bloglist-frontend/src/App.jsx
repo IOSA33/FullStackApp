@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import {
   BrowserRouter as Router,
-  Routes, Route, Link, useMatch
+  Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
 
 import blogService from './services/blogs'
@@ -9,6 +9,7 @@ import Login from './components/Login'
 import Blogs from './components/Blogs'
 import Logout from './components/Logout'
 import Blog from './components/Blog'
+import CreateForm from './components/CreateForm'
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState('')
@@ -16,6 +17,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -66,6 +69,25 @@ const App = () => {
       }
   }
 
+  const handleSubmitBlog = async (blogObject) => {
+      try {
+          const response = await blogService.create(blogObject)
+          console.log(response)
+          navigate('/')
+          setBlogs(blogs.concat(response))
+          setErrorMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+          setTimeout(() => {
+          setErrorMessage(null)
+          }, 5000)
+      } catch {
+          navigate('/')
+          setErrorMessage('Missed some inputs')
+          setTimeout(() => {
+          setErrorMessage(null)
+          }, 5000)
+      }
+  }
+
   const match = useMatch('/blogs/:id')
   const blog = match
     ? blogs.find(blog => blog.id === match.params.id)
@@ -83,6 +105,7 @@ const App = () => {
       <div>
         <Link style={padding} to='/'>blogs</Link>
         <Link style={padding} style={showWhenLoggedout} to='login'>login</Link>
+        <Link style={showWhenLoggedin} to='/create'>new blog</Link>
         <Logout style={showWhenLoggedin} user={user} setUser={setUser}/>
       </div>
 
@@ -95,6 +118,9 @@ const App = () => {
         }/>
         <Route path="/blogs/:id" element={
            <Blog user={user} blog={blog} updateLikes={handleUpdateBlog} deleteBlog={handleDeleteBlog}/>
+        }/>
+        <Route path="/create" element={
+          <CreateForm style={showWhenLoggedin} createBlog={handleSubmitBlog} />
         }/>
           
       </Routes>
