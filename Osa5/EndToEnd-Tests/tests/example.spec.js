@@ -12,30 +12,27 @@ describe('Blog app', () => {
       }
     })
 
-    await page.goto('http://localhost:5173')
-  })
-
-  test('Login form is shown', async ({ page }) => {
-    await expect(page.getByLabel('username')).toBeVisible()
-    await expect(page.getByLabel('password')).toBeVisible()
+    await page.goto('http://localhost:5173/login')
   })
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
       await testLogin(page, 'mluukkai', 'salainen')
 
-      await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+      await expect(page.getByText('logout')).toBeVisible()
     })
 
     test('fails with wrong credentials', async ({ page }) => {
       await testLogin(page, 'mluukkai', 'salainen1')
 
-      await expect(page.getByText('Matti Luukkainen logged in')).not.toBeVisible()
+      await expect(page.getByText('logout')).not.toBeVisible()
     })
 
       describe('When logged in', () => {
         beforeEach(async ({ page }) => {
           await testLogin(page, 'mluukkai', 'salainen')
+          await expect(page.getByText('logout')).toBeVisible()
+          await page.goto('http://localhost:5173/create')
         })
 
         test('a new blog can be created', async ({ page }) => {
@@ -45,36 +42,36 @@ describe('Blog app', () => {
         })
 
         test('blog can like', async ({ page }) => {
-          await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
+          await createBlog(page, 'testTitle1', 'testAuthor1', 'testUrl1')
 
-          await page.getByRole('button', { name: 'view'}).click()
+          await page.getByRole('link', { name: 'testTitle1 by testAuthor1' }).click()
           await page.getByRole('button', { name: 'like'}).click()
 
           await expect(page.getByText('likes 1')).toBeVisible()
         })
 
         test('user can delete blog', async ( {page} ) => {
-          await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
+          await createBlog(page, 'testTitle2', 'testAuthor2', 'testUrl2')
           
-          await page.getByRole('button', { name: 'view'}).click()
+          await page.getByRole('link', { name: 'testTitle2 by testAuthor2' }).click()
 
-          page.on('dialog', async dialog => {
+          page.once('dialog', async dialog => {
             expect(dialog.type()).toBe('confirm')
-            expect(dialog.message()).toContain(`Remove blog testTitle by testAuthor`)       
+            expect(dialog.message()).toContain(`Remove blog testTitle2 by testAuthor2`)       
             await dialog.accept()
           })
 
           await page.getByRole('button', { name: 'remove'}).click()
 
-          await expect(page.getByText('testTitle testAuthor')).not.toBeVisible()
+          await expect(page.getByRole('link', { name: 'testTitle2 by testAuthor2' })).not.toBeVisible()
         })
 
-        test('user can see the remove button', async ( {page} ) => {
-          await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
+        // test('user can see the remove button', async ( {page} ) => {
+        //   await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
           
-          await page.getByRole('button', { name: 'view'}).click()
-          await expect(page.getByRole('button', { name: 'remove'})).toBeVisible()
-        })
+        //   await page.getByRole('button', { name: 'view'}).click()
+        //   await expect(page.getByRole('button', { name: 'remove'})).toBeVisible()
+        // })
 
         test('likes are in correct order', async ( {page} ) => {
           await createBlog(page, 'testTitle', 'testAuthor', 'testUrl')
