@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import { Button } from "@mui/material"
 
 const Logout = ({style, user, setUser}) => {
     const navigate = useNavigate()
@@ -11,7 +12,7 @@ const Logout = ({style, user, setUser}) => {
     }
 
     return (
-        <button style={style} onClick={logoutHandle}>logout</button>
+        <Button color="inherit" style={style} onClick={logoutHandle}>LOGOUT</Button>
     )
 }
 

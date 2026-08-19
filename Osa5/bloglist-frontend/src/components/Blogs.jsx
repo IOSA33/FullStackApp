@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 const Blogs = ({errorMessage, showErrorMessage, user, blogs, setErrorMessage, setBlogs}) => {
     return (
         <div>
-            <h1>blogs</h1>
+            <h2>blogs</h2>
 
             {user && (
                 <div>

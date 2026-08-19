@@ -10,6 +10,8 @@ import Blogs from './components/Blogs'
 import Logout from './components/Logout'
 import Blog from './components/Blog'
 import CreateForm from './components/CreateForm'
+import Notification from './components/Notification'
+import { AppBar, Toolbar, Button, Typography } from '@mui/material'
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState('')
@@ -38,9 +40,7 @@ const App = () => {
   const showErrorMessage = () => {
     return (
       <div>
-        <b>
-          {errorMessage}
-        </b>
+          <Notification notification={errorMessage}/>
       </div>
     )
   }
@@ -76,6 +76,8 @@ const App = () => {
           navigate('/')
           setBlogs(blogs.concat(response))
           setErrorMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
+          
+          console.log(errorMessage)
           setTimeout(() => {
           setErrorMessage(null)
           }, 5000)
@@ -102,12 +104,19 @@ const App = () => {
 
   return (
     <div style={{marginLeft:80, marginTop:20}}>
-      <div>
-        <Link style={padding} to='/'>blogs</Link>
-        <Link style={padding} style={showWhenLoggedout} to='login'>login</Link>
-        <Link style={showWhenLoggedin} to='/create'>new blog</Link>
-        <Logout style={showWhenLoggedin} user={user} setUser={setUser}/>
-      </div>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" style={{ flexGrow: 1 }}>
+              Blog App
+          </Typography>
+          <div>
+            <Button color="inherit" style={padding} component={Link} to='/'>BLOGS</Button>
+            <Button color="inherit" style={{ ...padding, ...showWhenLoggedout }} component={Link} to='login'>LOGIN</Button>
+            <Button color="inherit" style={showWhenLoggedin} component={Link} to='/create'>NEW BLOG</Button>
+            <Logout color="inherit" style={showWhenLoggedin} user={user} setUser={setUser}/>
+          </div>
+        </Toolbar>
+      </AppBar>
 
       <Routes>
         <Route path="/login" element={
