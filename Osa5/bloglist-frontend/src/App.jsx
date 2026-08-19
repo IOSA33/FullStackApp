@@ -101,7 +101,7 @@ const App = () => {
   const showWhenLoggedin = {display: user ? '': 'none'}
 
   return (
-    <div>
+    <div style={{marginLeft:80, marginTop:20}}>
       <div>
         <Link style={padding} to='/'>blogs</Link>
         <Link style={padding} style={showWhenLoggedout} to='login'>login</Link>

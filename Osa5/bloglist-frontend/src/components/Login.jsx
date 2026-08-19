@@ -1,6 +1,7 @@
 import loginService from '../services/login'
 import blogService from '../services/blogs'
 import { useNavigate } from 'react-router-dom'
+import { TextField, Button } from '@mui/material'
 
 const Login = ({user, errorMessage, showErrorMessage, setUser, setUsername, setPassword, setErrorMessage, username, password}) => {
     const navigate = useNavigate()
@@ -28,12 +29,14 @@ const Login = ({user, errorMessage, showErrorMessage, setUser, setUsername, setP
  
     const loginForm = () => (
         <form onSubmit={handleLogin}>
-        <h2>log in application</h2>
+        <h2>Log in to application</h2>
 
         <div>
             <label>
-            username
-            <input
+            <label style={{display:'none'}}>username</label>
+            <TextField
+                variant="standard"
+                label="username"
                 type="text"
                 value={username}
                 onChange={({ target }) => setUsername(target.value)}
@@ -42,15 +45,17 @@ const Login = ({user, errorMessage, showErrorMessage, setUser, setUsername, setP
         </div>
         <div>
             <label>
-            password
-            <input
+            <label style={{display:'none'}}>password</label>
+            <TextField
+                variant="standard"
+                label="password"
                 type="password"
                 value={password}
                 onChange={({ target }) => setPassword(target.value)}
             />
             </label>
         </div>
-        <button type="submit">login</button>
+        <Button type="submit" variant='contained' style={{ marginTop: 10 }}>login</Button>
         </form>
     )
 
