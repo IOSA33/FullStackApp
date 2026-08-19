@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import Togglable from './Togglable'
 import { jwtDecode } from 'jwt-decode'
+import { Box, Button } from '@mui/material'
 
 const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
   const id = useParams().id
@@ -39,21 +40,22 @@ const Blog = ({ user, blog, updateLikes, deleteBlog }) => {
   }
 
   return (
-    <div className='blog'>
-      
-      <h1>{blog.title} by {blog.author}</h1>
-
-      <div>
-        {blog.url}
-        <br></br>
-        likes {blog.likes} <button style={remove_style} onClick={() => handleUpdatedLikes()}>like</button>
-        <br></br>
-        {blog.user?.name}
-        <br></br>
-        <button style={remove_button()} onClick={() => handleDeleteBlog()}>remove</button>
+    <Box sx={{widows: 10, border:'1px solid', marginTop: 2 , p: 2}}>
+      <div className='blog'>
+        
+        <h1>{blog.title}</h1>
+          <h3>by {blog.author}</h3>
+          <a href={blog.url}>{blog.url}</a>
+          <br></br>
+          <br></br>
+          Added by {blog.user?.name}
+          <br></br>
+          <br></br>
+          <b>{blog.likes} likes </b> 
+          <Button variant="outlined" style={{...remove_style, marginLeft:10}} onClick={() => handleUpdatedLikes()}>like</Button>
+          <Button variant="outlined" color="error" style={{...remove_button(), marginLeft:10}} onClick={() => handleDeleteBlog()}>remove</Button>
       </div>
-
-    </div>
+    </Box>
   )
 }
 
