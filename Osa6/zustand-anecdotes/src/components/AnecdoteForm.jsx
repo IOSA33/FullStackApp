@@ -1,12 +1,14 @@
 
-import { useAnecdoteActions } from '../store'
+import { useAnecdoteActions, useNotificationActions } from '../store'
 
 const App = () => {
   const { add } = useAnecdoteActions()
+  const { showNotification } = useNotificationActions()
 
   const addAnecdote = async (e) => {
     e.preventDefault()
     const content = e.target.anecdote.value
+    showNotification(`You added \'${content}\'`)
     add(content)
     e.target.reset()
   }
