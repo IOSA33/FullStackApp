@@ -2,9 +2,9 @@
 import { useAnecdoteActions } from '../store'
 
 const App = () => {
-  const { like, add } = useAnecdoteActions()
+  const { add } = useAnecdoteActions()
 
-  const addAnecdote = (e) => {
+  const addAnecdote = async (e) => {
     e.preventDefault()
     const content = e.target.anecdote.value
     add(content)
