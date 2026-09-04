@@ -49,8 +49,9 @@ const useAnecdoteStore = create((set, get) => ({
 
     initialize: async () => { 
       const anecdotes = await anecdoteService.getAll()
-      set(() => ({anecdotes}))
-    }
+      const sorted = [...anecdotes].sort((a, b) => b.votes - a.votes)
+      set({ anecdotes: sorted })
+    },
   },
 }))
 

@@ -32,6 +32,28 @@ describe('useNoteActions', () => {
     expect(notesResult.current).toEqual(mockNotes)
   })
 
+it.only('sorted by votes', async () => {
+    const mockAnecdotes = [
+        { id: 1, content: 'test1', votes: 1 },
+        { id: 2, content: 'test10', votes: 10 },
+        { id: 3, content: 'test5', votes: 5 },
+    ]
+    anecdoteService.getAll.mockResolvedValue(mockAnecdotes)
+
+    const { result: actionResult } = renderHook(() => useAnecdoteActions())
+    await act(async () => {
+        await actionResult.current.initialize()
+    })
+
+    const { result: notesResult } = renderHook(() => useAnecdotes())
+
+    expect(notesResult.current).toEqual([
+        { id: 2, content: 'test10', votes: 10 },
+        { id: 3, content: 'test5', votes: 5 },
+        { id: 1, content: 'test1', votes: 1 },
+    ])
+})
+
   it('add appends a new note', async () => {
     const newNote = { id: 2, content: 'New note', important: false }
     noteService.createNew.mockResolvedValue(newNote)
