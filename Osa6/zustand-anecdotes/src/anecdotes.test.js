@@ -18,68 +18,75 @@ beforeEach(() => {
 })
 
 describe('useNoteActions', () => {
-  it.only('initialize loads anecdotes from service', async () => {
-    const mockNotes = [{ id: 1, content: 'Test', votes: 1 }]
-    anecdoteService.getAll.mockResolvedValue(mockNotes)
+    it('initialize loads anecdotes from service', async () => {
+        const mockNotes = [{ id: 1, content: 'Test', votes: 1 }]
+        anecdoteService.getAll.mockResolvedValue(mockNotes)
 
-    const { result } = renderHook(() => useAnecdoteActions())
+        const { result } = renderHook(() => useAnecdoteActions())
 
-    await act(async () => {
-      await result.current.initialize()
+        await act(async () => {
+        await result.current.initialize()
+        })
+
+        const { result: notesResult } = renderHook(() => useAnecdotes())
+        expect(notesResult.current).toEqual(mockNotes)
     })
 
-    const { result: notesResult } = renderHook(() => useAnecdotes())
-    expect(notesResult.current).toEqual(mockNotes)
-  })
+    it('sorted by votes', async () => {
+        const mockAnecdotes = [
+            { id: 1, content: 'test1', votes: 1 },
+            { id: 2, content: 'test10', votes: 10 },
+            { id: 3, content: 'test5', votes: 5 },
+        ]
+        anecdoteService.getAll.mockResolvedValue(mockAnecdotes)
 
-it.only('sorted by votes', async () => {
-    const mockAnecdotes = [
-        { id: 1, content: 'test1', votes: 1 },
-        { id: 2, content: 'test10', votes: 10 },
-        { id: 3, content: 'test5', votes: 5 },
-    ]
-    anecdoteService.getAll.mockResolvedValue(mockAnecdotes)
+        const { result: actionResult } = renderHook(() => useAnecdoteActions())
+        await act(async () => {
+            await actionResult.current.initialize()
+        })
 
-    const { result: actionResult } = renderHook(() => useAnecdoteActions())
-    await act(async () => {
-        await actionResult.current.initialize()
+        const { result: notesResult } = renderHook(() => useAnecdotes())
+
+        expect(notesResult.current).toEqual([
+            { id: 2, content: 'test10', votes: 10 },
+            { id: 3, content: 'test5', votes: 5 },
+            { id: 1, content: 'test1', votes: 1 },
+        ])
     })
 
-    const { result: notesResult } = renderHook(() => useAnecdotes())
+    it.only('returned correct anecdotes', async () => {
+        const mockAnecdotes = [
+            { id: 1, content: 'test1', votes: 1 },
+            { id: 2, content: 'test10', votes: 10 },
+            { id: 3, content: 'test5', votes: 5 },
+        ]
+        anecdoteService.getAll.mockResolvedValue(mockAnecdotes)
 
-    expect(notesResult.current).toEqual([
-        { id: 2, content: 'test10', votes: 10 },
-        { id: 3, content: 'test5', votes: 5 },
-        { id: 1, content: 'test1', votes: 1 },
-    ])
-})
+        const { result: actionResult } = renderHook(() => useAnecdoteActions())
+        await act(async () => {
+            await actionResult.current.initialize()
+            actionResult.current.setFilterWord('test5')
+        })
 
-  it('add appends a new note', async () => {
-    const newNote = { id: 2, content: 'New note', important: false }
-    noteService.createNew.mockResolvedValue(newNote)
+        const { result: notesResult } = renderHook(() => useAnecdotes123())
 
-    const { result } = renderHook(() => useNoteActions())
-
-    await act(async () => {
-      await result.current.add('New note')
+        expect(notesResult.current).toEqual([
+            { id: 3, content: 'test5', votes: 5 }
+        ])
     })
 
-    const { result: notesResult } = renderHook(() => useNotes())
-    expect(notesResult.current).toContainEqual(newNote)
-  })
+    it('toggleImportance flips important flag', async () => {
+        const note = { id: 1, content: 'Test', important: false }
+        useNoteStore.setState({ notes: [note] })
+        noteService.update.mockResolvedValue({ ...note, important: true })
 
-  it('toggleImportance flips important flag', async () => {
-    const note = { id: 1, content: 'Test', important: false }
-    useNoteStore.setState({ notes: [note] })
-    noteService.update.mockResolvedValue({ ...note, important: true })
+        const { result } = renderHook(() => useNoteActions())
 
-    const { result } = renderHook(() => useNoteActions())
+        await act(async () => {
+        await result.current.toggleImportance(1)
+        })
 
-    await act(async () => {
-      await result.current.toggleImportance(1)
+        const { result: notesResult } = renderHook(() => useNotes())
+        expect(notesResult.current[0].important).toBe(true)
     })
-
-    const { result: notesResult } = renderHook(() => useNotes())
-    expect(notesResult.current[0].important).toBe(true)
-  })
 })
