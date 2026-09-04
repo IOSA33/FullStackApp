@@ -11,6 +11,7 @@ vi.mock('./services/anecdotes', () => ({
 
 import anecdoteService from './services/anecdotes'
 import useAnecdoteStore, { useAnecdotes, useAnecdotes123, useAnecdoteActions } from './store'
+import anecdotes from './services/anecdotes'
 
 beforeEach(() => {
   useAnecdoteStore.setState({ anecdotes: [], filterWord: '' })
@@ -54,7 +55,7 @@ describe('useNoteActions', () => {
         ])
     })
 
-    it.only('returned correct anecdotes', async () => {
+    it('returned correct anecdotes', async () => {
         const mockAnecdotes = [
             { id: 1, content: 'test1', votes: 1 },
             { id: 2, content: 'test10', votes: 10 },
@@ -75,18 +76,18 @@ describe('useNoteActions', () => {
         ])
     })
 
-    it('toggleImportance flips important flag', async () => {
-        const note = { id: 1, content: 'Test', important: false }
-        useNoteStore.setState({ notes: [note] })
-        noteService.update.mockResolvedValue({ ...note, important: true })
+    it('like increases the votes amount', async () => {
+        const note = { id: 1, content: 'Test', votes: 1 }
+        useAnecdoteStore.setState({ anecdotes: [note] })
+        anecdoteService.update.mockResolvedValue({ ...note, votes: 2 })
 
-        const { result } = renderHook(() => useNoteActions())
+        const { result } = renderHook(() => useAnecdoteActions())
 
         await act(async () => {
-        await result.current.toggleImportance(1)
+            await result.current.like(1)
         })
 
-        const { result: notesResult } = renderHook(() => useNotes())
-        expect(notesResult.current[0].important).toBe(true)
+        const { result: notesResult } = renderHook(() => useAnecdotes())
+        expect(notesResult.current[0].votes).toBe(2)
     })
 })
